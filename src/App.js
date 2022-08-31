@@ -1,25 +1,34 @@
-import logo from './logo.svg';
 import './App.css';
+import io from 'socket.io-client';
+import { useState, useEffect } from 'react';
+
+const socket = io('http://localhost:4000');
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		socket.emit('message', message);
+		setmessage('');
+	};
+
+	useEffect(() => {
+		socket.on('message', (message) => console.log(message));
+
+		return () => {
+			socket.off('message', (message) => console.log(message));
+		};
+	}, []);
+
+	const [message, setmessage] = useState('');
+
+	return (
+		<div className="App">
+			<form onSubmit={handleSubmit}>
+				<input type="text" onChange={(e) => setmessage(e.target.value)} value={message} />
+				<button>Enviar</button>
+			</form>
+		</div>
+	);
 }
 
 export default App;
